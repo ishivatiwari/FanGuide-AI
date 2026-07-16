@@ -1,0 +1,26 @@
+/**
+ * FanGuide AI — Main Application Entry
+ *
+ * Sets up React, i18n, routing, and the global context provider.
+ */
+
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import App from './App';
+import { AppProvider } from './context/AppContext';
+import './i18n'; // Initialize i18next
+import './index.css';
+
+const root = document.getElementById('root');
+if (!root) throw new Error('Root element not found');
+
+ReactDOM.createRoot(root).render(
+  <React.StrictMode>
+    <BrowserRouter>
+      <AppProvider>
+        <App />
+      </AppProvider>
+    </BrowserRouter>
+  </React.StrictMode>
+);

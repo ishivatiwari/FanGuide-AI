@@ -1,0 +1,192 @@
+/**
+ * FanGuide AI — Global CSS
+ *
+ * Tailwind base styles + custom design system extensions.
+ * Includes:
+ *   - RTL layout support (Arabic)
+ *   - High-contrast mode overrides
+ *   - Focus-visible states (WCAG 2.1)
+ *   - Smooth scrolling
+ *   - Custom scrollbar styling
+ *   - Reduced motion support
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Root Variables ───────────────────────────────────────────────────────── */
+:root {
+  --font-size-base: 16px;
+  --focus-ring: 3px solid #ffc80a;
+  --transition-base: 200ms ease;
+}
+
+/* ── Base Resets ──────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: var(--font-size-base);
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  @apply bg-stadium-dark text-white font-sans antialiased;
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+/* ── RTL Support (Arabic) ─────────────────────────────────────────────────── */
+[dir="rtl"] {
+  text-align: right;
+}
+
+[dir="rtl"] .chat-message-user {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+[dir="rtl"] .chat-message-assistant {
+  margin-right: 0;
+  margin-left: auto;
+}
+
+/* ── Focus Styles (WCAG 2.1 AA) ──────────────────────────────────────────── */
+/* Using focus-visible so mouse users don't see rings on click */
+*:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Remove default outline — only show on keyboard navigation */
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ── Accessibility: Skip to Content Link ──────────────────────────────────── */
+.skip-to-content {
+  @apply sr-only;
+}
+
+.skip-to-content:focus {
+  @apply not-sr-only absolute top-4 left-4 z-50 px-4 py-2 rounded-lg;
+  @apply bg-gold-400 text-stadium-dark font-semibold;
+}
+
+/* ── High Contrast Mode ───────────────────────────────────────────────────── */
+.high-contrast {
+  --tw-bg-opacity: 1;
+}
+
+.high-contrast body {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+.high-contrast .bg-stadium-card,
+.high-contrast .bg-stadium-dark {
+  background: #000000 !important;
+  border: 1px solid #ffffff !important;
+}
+
+.high-contrast a,
+.high-contrast button {
+  outline: 2px solid #ffff00 !important;
+}
+
+/* ── Reduced Motion ───────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── Custom Scrollbar (Webkit) ────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #111f3a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2a4070;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3a5090;
+}
+
+/* ── Typography Scale Utilities ───────────────────────────────────────────── */
+/* These are set via JS when the user adjusts font size in settings */
+html[data-font-size="sm"]  { --font-size-base: 14px; }
+html[data-font-size="md"]  { --font-size-base: 16px; }
+html[data-font-size="lg"]  { --font-size-base: 18px; }
+html[data-font-size="xl"]  { --font-size-base: 20px; }
+
+/* ── Glass Card ───────────────────────────────────────────────────────────── */
+.glass-card {
+  background: rgba(17, 31, 58, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(48, 96, 255, 0.15);
+}
+
+/* ── Typing Indicator ─────────────────────────────────────────────────────── */
+.typing-dot {
+  @apply w-2 h-2 rounded-full bg-brand-400;
+  animation: bounce 1.2s infinite;
+}
+
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes bounce {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-6px); }
+}
+
+/* ── Shimmer Loading ──────────────────────────────────────────────────────── */
+.shimmer {
+  background: linear-gradient(90deg, #111f3a 0%, #1e3160 50%, #111f3a 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* ── Crowd Density Badge Colors ───────────────────────────────────────────── */
+.density-low    { @apply bg-green-500/20 text-green-400 border border-green-500/30; }
+.density-medium { @apply bg-amber-500/20 text-amber-400 border border-amber-500/30; }
+.density-high   { @apply bg-red-500/20   text-red-400   border border-red-500/30; }
+
+/* ── Chat Message Animations ──────────────────────────────────────────────── */
+.message-enter {
+  animation: slideUp 0.25s ease-out forwards;
+}
+
+/* ── Route Step Connector ─────────────────────────────────────────────────── */
+.route-step::before {
+  content: '';
+  @apply absolute left-3 top-8 bottom-0 w-0.5 bg-stadium-border;
+}
+
+.route-step:last-child::before {
+  display: none;
+}

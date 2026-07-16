@@ -1,0 +1,77 @@
+{
+  "_comment": "SIMULATED DATA — Transit schedules for MetLife Stadium (East Rutherford, NJ). Modeled after realistic NJ Transit / shuttle patterns for a World Cup event. In production, replace with a live transit API adapter.",
+  "options": [
+    {
+      "id": "njt-meadowlands",
+      "name": "NJ Transit — Meadowlands Rail",
+      "type": "rail",
+      "description": "Direct rail service from Penn Station (NY) and Secaucus Junction to Meadowlands Station, 5-min walk to Gate A.",
+      "hub": "transit-N",
+      "destinations": [
+        { "name": "Penn Station (NYC)", "travelMinutes": 35, "walkToHubMinutes": 10 },
+        { "name": "Secaucus Junction", "travelMinutes": 12, "walkToHubMinutes": 10 },
+        { "name": "Newark Penn Station", "travelMinutes": 22, "walkToHubMinutes": 10 }
+      ],
+      "frequency": "Every 15 min on matchdays",
+      "accessible": true,
+      "accessibilityNotes": "All trains are wheelchair accessible. Priority seating available."
+    },
+    {
+      "id": "shuttle-north",
+      "name": "Official FIFA Shuttle — North Hub",
+      "type": "shuttle",
+      "description": "Free official shuttle from North Transit Hub to Times Square (NYC) and Lincoln Tunnel park-and-ride.",
+      "hub": "transit-N",
+      "destinations": [
+        { "name": "Times Square (NYC)", "travelMinutes": 40, "walkToHubMinutes": 5 },
+        { "name": "Lincoln Tunnel P+R", "travelMinutes": 15, "walkToHubMinutes": 5 }
+      ],
+      "frequency": "Every 10 min during post-game hour",
+      "accessible": true,
+      "accessibilityNotes": "Wheelchair-accessible vehicles available. Request at the hub."
+    },
+    {
+      "id": "shuttle-west",
+      "name": "Accessible Shuttle — West Hub",
+      "type": "shuttle",
+      "description": "Priority accessible shuttle service from West Hub. Serves nearby hotels and accessible parking areas.",
+      "hub": "transit-W",
+      "destinations": [
+        { "name": "Marriott Meadowlands Hotel", "travelMinutes": 8, "walkToHubMinutes": 3 },
+        { "name": "Accessible Parking Lot C", "travelMinutes": 5, "walkToHubMinutes": 3 },
+        { "name": "Hilton Fort Lee", "travelMinutes": 20, "walkToHubMinutes": 3 }
+      ],
+      "frequency": "Every 20 min, extended on matchdays",
+      "accessible": true,
+      "accessibilityNotes": "All vehicles are fully accessible. No pre-booking required."
+    },
+    {
+      "id": "bus-south",
+      "name": "NJ Transit Bus — South Hub",
+      "type": "bus",
+      "description": "NJ Transit express bus service from South Hub to multiple New Jersey destinations.",
+      "hub": "transit-S",
+      "destinations": [
+        { "name": "Newark Airport", "travelMinutes": 45, "walkToHubMinutes": 8 },
+        { "name": "Hackensack Bus Terminal", "travelMinutes": 20, "walkToHubMinutes": 8 }
+      ],
+      "frequency": "Every 30 min",
+      "accessible": true,
+      "accessibilityNotes": "Low-floor buses with ramp access."
+    },
+    {
+      "id": "rideshare-east",
+      "name": "Rideshare Pickup — East",
+      "type": "rideshare",
+      "description": "Designated Uber/Lyft pickup zone in East Parking area.",
+      "hub": "transit-E",
+      "destinations": [
+        { "name": "Manhattan (avg)", "travelMinutes": 35, "walkToHubMinutes": 12 },
+        { "name": "Jersey City", "travelMinutes": 20, "walkToHubMinutes": 12 }
+      ],
+      "frequency": "On demand (surge pricing applies post-game)",
+      "accessible": true,
+      "accessibilityNotes": "Select 'Wheelchair Accessible' in app for adapted vehicles."
+    }
+  ]
+}

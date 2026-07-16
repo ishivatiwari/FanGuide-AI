@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <circle cx="50" cy="50" r="48" fill="#0A1628" stroke="#ffc80a" stroke-width="4"/>
+  <text x="50" y="62" font-size="40" font-family="Inter" font-weight="bold" fill="#ffc80a" text-anchor="middle">⚽</text>
+</svg>

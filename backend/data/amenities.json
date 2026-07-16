@@ -1,0 +1,158 @@
+{
+  "_comment": "SIMULATED DATA — Amenity details for MetLife Stadium. In production, replace with a live ticketing/operations API feed via the data-adapter layer.",
+  "amenities": [
+    {
+      "id": "restroom-N1",
+      "name": "Restrooms — North Lower",
+      "type": "restroom",
+      "nodeId": "restroom-N1",
+      "accessible": true,
+      "features": ["accessible-stall", "baby-changing"],
+      "gender": "all",
+      "level": 1
+    },
+    {
+      "id": "restroom-N2",
+      "name": "Restrooms — North Upper (Fully Accessible)",
+      "type": "restroom",
+      "nodeId": "restroom-N2",
+      "accessible": true,
+      "features": ["accessible-stall", "baby-changing", "automatic-door"],
+      "gender": "all",
+      "level": 2
+    },
+    {
+      "id": "restroom-E1",
+      "name": "Restrooms — East Lower",
+      "type": "restroom",
+      "nodeId": "restroom-E1",
+      "accessible": true,
+      "features": ["accessible-stall"],
+      "gender": "all",
+      "level": 1
+    },
+    {
+      "id": "restroom-S1",
+      "name": "Restrooms — South Lower",
+      "type": "restroom",
+      "nodeId": "restroom-S1",
+      "accessible": true,
+      "features": ["accessible-stall", "baby-changing"],
+      "gender": "all",
+      "level": 1
+    },
+    {
+      "id": "restroom-W1",
+      "name": "Restrooms — West Lower (Priority Accessible)",
+      "type": "restroom",
+      "nodeId": "restroom-W1",
+      "accessible": true,
+      "features": ["accessible-stall", "baby-changing", "automatic-door", "wider-doorway"],
+      "gender": "all",
+      "level": 1
+    },
+    {
+      "id": "food-N1",
+      "name": "North Food Court",
+      "type": "food",
+      "nodeId": "food-N1",
+      "accessible": true,
+      "dietaryOptions": ["halal", "vegan", "vegetarian", "nut-free"],
+      "level": 1,
+      "vendors": ["World Cup Grill", "Green Garden", "Halal Bites"]
+    },
+    {
+      "id": "food-E1",
+      "name": "East Food Court",
+      "type": "food",
+      "nodeId": "food-E1",
+      "accessible": true,
+      "dietaryOptions": ["standard"],
+      "level": 1,
+      "vendors": ["Stadium Classics", "Pretzel Palace", "Soda Stop"]
+    },
+    {
+      "id": "food-S1",
+      "name": "South Food Court",
+      "type": "food",
+      "nodeId": "food-S1",
+      "accessible": true,
+      "dietaryOptions": ["kosher", "vegetarian", "nut-free"],
+      "level": 1,
+      "vendors": ["Kosher Kitchen", "Veggie Wrap Bar", "Juice Bar"]
+    },
+    {
+      "id": "food-W1",
+      "name": "West Food Court",
+      "type": "food",
+      "nodeId": "food-W1",
+      "accessible": true,
+      "dietaryOptions": ["gluten-free", "vegan", "dairy-free"],
+      "level": 1,
+      "vendors": ["Free From Foods", "Empanada Express", "Acai Bowl Bar"]
+    },
+    {
+      "id": "merch-N1",
+      "name": "Official Merchandise — North",
+      "type": "merch",
+      "nodeId": "merch-N1",
+      "accessible": true,
+      "level": 1
+    },
+    {
+      "id": "merch-S1",
+      "name": "Official Merchandise — South",
+      "type": "merch",
+      "nodeId": "merch-S1",
+      "accessible": true,
+      "level": 1
+    },
+    {
+      "id": "firstaid-N",
+      "name": "First Aid Post — North",
+      "type": "firstaid",
+      "nodeId": "firstaid-N",
+      "accessible": true,
+      "level": 0,
+      "staffed": true,
+      "defibrillatorOnSite": true
+    },
+    {
+      "id": "firstaid-S",
+      "name": "First Aid Post — South",
+      "type": "firstaid",
+      "nodeId": "firstaid-S",
+      "accessible": true,
+      "level": 0,
+      "staffed": true,
+      "defibrillatorOnSite": true
+    },
+    {
+      "id": "quietroom-W",
+      "name": "Quiet Room / Sensory Zone — West",
+      "type": "accessibility",
+      "nodeId": "quietroom-W",
+      "accessible": true,
+      "level": 1,
+      "features": ["low-light", "noise-cancelling", "sensory-toys", "calming-space"]
+    },
+    {
+      "id": "asl-N",
+      "name": "Sign Language Help Point — North",
+      "type": "accessibility",
+      "nodeId": "asl-N",
+      "accessible": true,
+      "level": 0,
+      "features": ["asl-interpreter", "video-relay"]
+    },
+    {
+      "id": "asl-E",
+      "name": "Sign Language Help Point — East",
+      "type": "accessibility",
+      "nodeId": "asl-E",
+      "accessible": true,
+      "level": 0,
+      "features": ["asl-interpreter"]
+    }
+  ]
+}

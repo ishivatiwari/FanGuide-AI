@@ -1,0 +1,144 @@
+{
+  "_comment": "SIMULATED DATA — MetLife Stadium layout (fictional but realistic). In production, replace this adapter with a real IoT/ticketing API feed. Node IDs map to physical locations; edge weights represent walking time in seconds.",
+  "nodes": [
+    { "id": "gate-A", "label": "Gate A (North)", "type": "gate", "level": 0, "x": 200, "y": 50, "accessible": true },
+    { "id": "gate-B", "label": "Gate B (North-East)", "type": "gate", "level": 0, "x": 350, "y": 80, "accessible": true },
+    { "id": "gate-C", "label": "Gate C (East)", "type": "gate", "level": 0, "x": 450, "y": 200, "accessible": true },
+    { "id": "gate-D", "label": "Gate D (South-East)", "type": "gate", "level": 0, "x": 400, "y": 350, "accessible": true },
+    { "id": "gate-E", "label": "Gate E (South)", "type": "gate", "level": 0, "x": 200, "y": 430, "accessible": true },
+    { "id": "gate-F", "label": "Gate F (South-West)", "type": "gate", "level": 0, "x": 60, "y": 350, "accessible": true },
+    { "id": "gate-G", "label": "Gate G (West)", "type": "gate", "level": 0, "x": 20, "y": 200, "accessible": true },
+    { "id": "gate-H", "label": "Gate H (North-West)", "type": "gate", "level": 0, "x": 80, "y": 80, "accessible": true },
+
+    { "id": "concourse-N", "label": "North Concourse", "type": "concourse", "level": 1, "x": 200, "y": 120, "accessible": true },
+    { "id": "concourse-E", "label": "East Concourse", "type": "concourse", "level": 1, "x": 380, "y": 240, "accessible": true },
+    { "id": "concourse-S", "label": "South Concourse", "type": "concourse", "level": 1, "x": 200, "y": 360, "accessible": true },
+    { "id": "concourse-W", "label": "West Concourse", "type": "concourse", "level": 1, "x": 60, "y": 240, "accessible": true },
+
+    { "id": "upper-N", "label": "Upper North Concourse", "type": "concourse", "level": 2, "x": 200, "y": 100, "accessible": true },
+    { "id": "upper-E", "label": "Upper East Concourse", "type": "concourse", "level": 2, "x": 380, "y": 220, "accessible": true },
+    { "id": "upper-S", "label": "Upper South Concourse", "type": "concourse", "level": 2, "x": 200, "y": 380, "accessible": true },
+    { "id": "upper-W", "label": "Upper West Concourse", "type": "concourse", "level": 2, "x": 60, "y": 220, "accessible": true },
+
+    { "id": "section-100", "label": "Section 100 (Lower North)", "type": "section", "level": 1, "x": 200, "y": 150, "accessible": true },
+    { "id": "section-110", "label": "Section 110 (Lower East)", "type": "section", "level": 1, "x": 340, "y": 200, "accessible": true },
+    { "id": "section-120", "label": "Section 120 (Lower South)", "type": "section", "level": 1, "x": 200, "y": 320, "accessible": true },
+    { "id": "section-130", "label": "Section 130 (Lower West)", "type": "section", "level": 1, "x": 100, "y": 200, "accessible": true },
+    { "id": "section-200", "label": "Section 200 (Upper North)", "type": "section", "level": 2, "x": 200, "y": 140, "accessible": true },
+    { "id": "section-210", "label": "Section 210 (Upper East)", "type": "section", "level": 2, "x": 350, "y": 200, "accessible": true },
+    { "id": "section-220", "label": "Section 220 (Upper South)", "type": "section", "level": 2, "x": 200, "y": 330, "accessible": true },
+    { "id": "section-230", "label": "Section 230 (Upper West)", "type": "section", "level": 2, "x": 90, "y": 200, "accessible": true },
+
+    { "id": "restroom-N1", "label": "Restrooms — North, Lower", "type": "restroom", "level": 1, "x": 180, "y": 130, "accessible": true },
+    { "id": "restroom-N2", "label": "Restrooms — North, Upper (Accessible)", "type": "restroom", "level": 2, "x": 220, "y": 110, "accessible": true },
+    { "id": "restroom-E1", "label": "Restrooms — East, Lower", "type": "restroom", "level": 1, "x": 400, "y": 240, "accessible": true },
+    { "id": "restroom-S1", "label": "Restrooms — South, Lower", "type": "restroom", "level": 1, "x": 220, "y": 370, "accessible": true },
+    { "id": "restroom-W1", "label": "Restrooms — West, Lower (Accessible)", "type": "restroom", "level": 1, "x": 50, "y": 240, "accessible": true },
+
+    { "id": "food-N1", "label": "Food Court — North (Halal/Vegan options)", "type": "food", "level": 1, "x": 190, "y": 125, "accessible": true },
+    { "id": "food-E1", "label": "Food Court — East (General)", "type": "food", "level": 1, "x": 395, "y": 230, "accessible": true },
+    { "id": "food-S1", "label": "Food Court — South (Kosher options)", "type": "food", "level": 1, "x": 200, "y": 355, "accessible": true },
+    { "id": "food-W1", "label": "Food Court — West (Gluten-free options)", "type": "food", "level": 1, "x": 55, "y": 235, "accessible": true },
+
+    { "id": "merch-N1", "label": "Official Merchandise — North", "type": "merch", "level": 1, "x": 210, "y": 135, "accessible": true },
+    { "id": "merch-S1", "label": "Official Merchandise — South", "type": "merch", "level": 1, "x": 195, "y": 365, "accessible": true },
+
+    { "id": "firstaid-N", "label": "First Aid Post — North", "type": "firstaid", "level": 0, "x": 200, "y": 60, "accessible": true },
+    { "id": "firstaid-S", "label": "First Aid Post — South", "type": "firstaid", "level": 0, "x": 200, "y": 420, "accessible": true },
+
+    { "id": "quietroom-W", "label": "Quiet Room / Sensory Zone — West", "type": "accessibility", "level": 1, "x": 40, "y": 250, "accessible": true },
+    { "id": "asl-N", "label": "Sign Language Help Point — North", "type": "accessibility", "level": 0, "x": 205, "y": 55, "accessible": true },
+    { "id": "asl-E", "label": "Sign Language Help Point — East", "type": "accessibility", "level": 0, "x": 455, "y": 205, "accessible": true },
+
+    { "id": "transit-N", "label": "North Transit Hub (Shuttle/Metro)", "type": "transit", "level": 0, "x": 200, "y": 10, "accessible": true },
+    { "id": "transit-S", "label": "South Transit Hub (Bus Stop)", "type": "transit", "level": 0, "x": 200, "y": 470, "accessible": true },
+    { "id": "transit-E", "label": "East Parking / Rideshare", "type": "transit", "level": 0, "x": 490, "y": 240, "accessible": true },
+    { "id": "transit-W", "label": "West Parking / Accessible Shuttle", "type": "transit", "level": 0, "x": 5, "y": 240, "accessible": true },
+
+    { "id": "lift-NW", "label": "Elevator — North-West (All Levels)", "type": "lift", "level": 0, "x": 120, "y": 100, "accessible": true },
+    { "id": "lift-NE", "label": "Elevator — North-East (All Levels)", "type": "lift", "level": 0, "x": 300, "y": 100, "accessible": true },
+    { "id": "lift-SW", "label": "Elevator — South-West (All Levels)", "type": "lift", "level": 0, "x": 100, "y": 380, "accessible": true },
+    { "id": "lift-SE", "label": "Elevator — South-East (All Levels)", "type": "lift", "level": 0, "x": 320, "y": 380, "accessible": true },
+
+    { "id": "stairs-N1", "label": "Stairs — North Block 1", "type": "stairs", "level": 0, "x": 170, "y": 105, "accessible": false },
+    { "id": "stairs-N2", "label": "Stairs — North Block 2", "type": "stairs", "level": 0, "x": 240, "y": 105, "accessible": false },
+    { "id": "stairs-E1", "label": "Stairs — East Block", "type": "stairs", "level": 0, "x": 420, "y": 200, "accessible": false },
+    { "id": "stairs-S1", "label": "Stairs — South Block", "type": "stairs", "level": 0, "x": 200, "y": 400, "accessible": false }
+  ],
+  "edges": [
+    { "from": "gate-A", "to": "concourse-N", "weight": 60, "accessible": true, "via": "ramp" },
+    { "from": "gate-B", "to": "concourse-N", "weight": 75, "accessible": true, "via": "ramp" },
+    { "from": "gate-C", "to": "concourse-E", "weight": 60, "accessible": true, "via": "ramp" },
+    { "from": "gate-D", "to": "concourse-E", "weight": 75, "accessible": true, "via": "ramp" },
+    { "from": "gate-E", "to": "concourse-S", "weight": 60, "accessible": true, "via": "ramp" },
+    { "from": "gate-F", "to": "concourse-S", "weight": 75, "accessible": true, "via": "ramp" },
+    { "from": "gate-G", "to": "concourse-W", "weight": 60, "accessible": true, "via": "ramp" },
+    { "from": "gate-H", "to": "concourse-N", "weight": 90, "accessible": true, "via": "ramp" },
+
+    { "from": "concourse-N", "to": "concourse-E", "weight": 120, "accessible": true, "via": "walkway" },
+    { "from": "concourse-E", "to": "concourse-S", "weight": 120, "accessible": true, "via": "walkway" },
+    { "from": "concourse-S", "to": "concourse-W", "weight": 120, "accessible": true, "via": "walkway" },
+    { "from": "concourse-W", "to": "concourse-N", "weight": 120, "accessible": true, "via": "walkway" },
+
+    { "from": "concourse-N", "to": "upper-N", "weight": 45, "accessible": true, "via": "lift", "liftId": "lift-NW" },
+    { "from": "concourse-N", "to": "upper-N", "weight": 30, "accessible": false, "via": "stairs", "stairsId": "stairs-N1" },
+    { "from": "concourse-E", "to": "upper-E", "weight": 45, "accessible": true, "via": "lift", "liftId": "lift-NE" },
+    { "from": "concourse-E", "to": "upper-E", "weight": 30, "accessible": false, "via": "stairs", "stairsId": "stairs-E1" },
+    { "from": "concourse-S", "to": "upper-S", "weight": 45, "accessible": true, "via": "lift", "liftId": "lift-SE" },
+    { "from": "concourse-S", "to": "upper-S", "weight": 30, "accessible": false, "via": "stairs", "stairsId": "stairs-S1" },
+    { "from": "concourse-W", "to": "upper-W", "weight": 45, "accessible": true, "via": "lift", "liftId": "lift-SW" },
+
+    { "from": "upper-N", "to": "upper-E", "weight": 130, "accessible": true, "via": "walkway" },
+    { "from": "upper-E", "to": "upper-S", "weight": 130, "accessible": true, "via": "walkway" },
+    { "from": "upper-S", "to": "upper-W", "weight": 130, "accessible": true, "via": "walkway" },
+    { "from": "upper-W", "to": "upper-N", "weight": 130, "accessible": true, "via": "walkway" },
+
+    { "from": "concourse-N", "to": "section-100", "weight": 60, "accessible": true, "via": "walkway" },
+    { "from": "concourse-E", "to": "section-110", "weight": 60, "accessible": true, "via": "walkway" },
+    { "from": "concourse-S", "to": "section-120", "weight": 60, "accessible": true, "via": "walkway" },
+    { "from": "concourse-W", "to": "section-130", "weight": 60, "accessible": true, "via": "walkway" },
+    { "from": "upper-N", "to": "section-200", "weight": 60, "accessible": true, "via": "walkway" },
+    { "from": "upper-E", "to": "section-210", "weight": 60, "accessible": true, "via": "walkway" },
+    { "from": "upper-S", "to": "section-220", "weight": 60, "accessible": true, "via": "walkway" },
+    { "from": "upper-W", "to": "section-230", "weight": 60, "accessible": true, "via": "walkway" },
+
+    { "from": "concourse-N", "to": "restroom-N1", "weight": 30, "accessible": true, "via": "walkway" },
+    { "from": "upper-N", "to": "restroom-N2", "weight": 25, "accessible": true, "via": "walkway" },
+    { "from": "concourse-E", "to": "restroom-E1", "weight": 30, "accessible": true, "via": "walkway" },
+    { "from": "concourse-S", "to": "restroom-S1", "weight": 30, "accessible": true, "via": "walkway" },
+    { "from": "concourse-W", "to": "restroom-W1", "weight": 25, "accessible": true, "via": "walkway" },
+
+    { "from": "concourse-N", "to": "food-N1", "weight": 20, "accessible": true, "via": "walkway" },
+    { "from": "concourse-E", "to": "food-E1", "weight": 20, "accessible": true, "via": "walkway" },
+    { "from": "concourse-S", "to": "food-S1", "weight": 20, "accessible": true, "via": "walkway" },
+    { "from": "concourse-W", "to": "food-W1", "weight": 20, "accessible": true, "via": "walkway" },
+
+    { "from": "concourse-N", "to": "merch-N1", "weight": 25, "accessible": true, "via": "walkway" },
+    { "from": "concourse-S", "to": "merch-S1", "weight": 25, "accessible": true, "via": "walkway" },
+
+    { "from": "gate-A", "to": "firstaid-N", "weight": 45, "accessible": true, "via": "walkway" },
+    { "from": "gate-E", "to": "firstaid-S", "weight": 45, "accessible": true, "via": "walkway" },
+
+    { "from": "concourse-W", "to": "quietroom-W", "weight": 30, "accessible": true, "via": "walkway" },
+    { "from": "gate-A", "to": "asl-N", "weight": 20, "accessible": true, "via": "walkway" },
+    { "from": "gate-C", "to": "asl-E", "weight": 20, "accessible": true, "via": "walkway" },
+
+    { "from": "gate-A", "to": "transit-N", "weight": 90, "accessible": true, "via": "walkway" },
+    { "from": "gate-H", "to": "transit-N", "weight": 60, "accessible": true, "via": "walkway" },
+    { "from": "gate-E", "to": "transit-S", "weight": 90, "accessible": true, "via": "walkway" },
+    { "from": "gate-F", "to": "transit-S", "weight": 60, "accessible": true, "via": "walkway" },
+    { "from": "gate-C", "to": "transit-E", "weight": 90, "accessible": true, "via": "walkway" },
+    { "from": "gate-D", "to": "transit-E", "weight": 60, "accessible": true, "via": "walkway" },
+    { "from": "gate-G", "to": "transit-W", "weight": 90, "accessible": true, "via": "accessible-shuttle" },
+
+    { "from": "gate-A", "to": "lift-NW", "weight": 45, "accessible": true, "via": "walkway" },
+    { "from": "gate-B", "to": "lift-NE", "weight": 45, "accessible": true, "via": "walkway" },
+    { "from": "gate-F", "to": "lift-SW", "weight": 45, "accessible": true, "via": "walkway" },
+    { "from": "gate-D", "to": "lift-SE", "weight": 45, "accessible": true, "via": "walkway" },
+
+    { "from": "lift-NW", "to": "concourse-N", "weight": 30, "accessible": true, "via": "walkway" },
+    { "from": "lift-NE", "to": "concourse-E", "weight": 30, "accessible": true, "via": "walkway" },
+    { "from": "lift-SW", "to": "concourse-W", "weight": 30, "accessible": true, "via": "walkway" },
+    { "from": "lift-SE", "to": "concourse-S", "weight": 30, "accessible": true, "via": "walkway" }
+  ]
+}
