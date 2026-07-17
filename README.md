@@ -25,35 +25,35 @@ FanGuide AI is a GenAI-powered, mobile-first PWA that helps fans navigate MetLif
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│                    FAN'S MOBILE BROWSER (PWA)                        │
-│   React 18 + Vite + TypeScript + Tailwind CSS                        │
-│   ChatPage (SSE) | MapPage (polling) | Settings | Dashboard          │
+│                    FAN'S MOBILE BROWSER (PWA)                       │
+│   React 18 + Vite + TypeScript + Tailwind CSS                       │
+│   ChatPage (SSE) | MapPage (polling) | Settings | Dashboard         │
 └─────────────────────────────────────────────────────────────────────┘
           │  HTTP/SSE (no API key ever in browser)
           ▼
 ┌─────────────────────────────────────────────────────────────────────┐
-│        EXPRESS + TYPESCRIPT BACKEND (Secure Proxy)                   │
+│        EXPRESS + TYPESCRIPT BACKEND (Secure Proxy)                  │
 │  [Helmet] → [CORS] → [Rate Limit] → [Zod Validation] → Routes       │
-│                                                                       │
-│  POST /api/chat — Agentic loop (up to 5 rounds):                     │
+│                                                                     │
+│  POST /api/chat — Agentic loop (up to 5 rounds):                    │
 │    Validate → System Prompt → Claude API → Tool Calls → SSE Stream  │
-│                                                                       │
-│  Tool Handlers:                                                       │
-│    getRoute()           — Dijkstra over stadium graph                 │
-│    getCrowdDensity()    — Live zone congestion                        │
-│    getWaitTime()        — Queue estimation per amenity                │
-│    getTransportOptions() — Leave-by time calculation                  │
-│    getAccessibilityInfo() — Lifts, ramps, quiet rooms, ASL           │
-│                                                                       │
-│  Data Layer (adapter pattern):                                        │
-│    stadium-graph.json | amenities.json | transit.json | crowd state  │
+│                                                                     │
+│  Tool Handlers:                                                     │
+│    getRoute()           — Dijkstra over stadium graph               │
+│    getCrowdDensity()    — Live zone congestion                      │
+│    getWaitTime()        — Queue estimation per amenity              │
+│    getTransportOptions() — Leave-by time calculation                │
+│    getAccessibilityInfo() — Lifts, ramps, quiet rooms, ASL          │
+│                                                                     │
+│  Data Layer (adapter pattern):                                      │
+│    stadium-graph.json | amenities.json | transit.json | crowd state │
 └─────────────────────────────────────────────────────────────────────┘
           │  ANTHROPIC_API_KEY (server-only)
           ▼
 ┌─────────────────────────────────────────────────────────────────────┐
-│          GOOGLE GEMINI API (gemini-2.0-flash)                              │
-│  Tool-calling: Gemini MUST call a tool to get any factual stadium    │
-│  data — it cannot hallucinate walking times, crowd levels, etc.      │
+│          GOOGLE GEMINI API (gemini-2.0-flash)                       │
+│  Tool-calling: Gemini MUST call a tool to get any factual stadium   │
+│  data — it cannot hallucinate walking times, crowd levels, etc.     │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
