@@ -123,14 +123,18 @@ export function useChat(context: ChatContext): UseChatReturn {
           }
         }
       } catch (err) {
-        const errorMsg = err instanceof Error ? err.message : 'Connection error';
+        const errorMsg = err instanceof Error && err.message.includes('HTTP')
+          ? 'Could not reach the server. Is the backend running?'
+          : 'Something went wrong. Please try again.';
         setMessages((prev) =>
           prev.map((m) =>
             m.id === assistantId
               ? {
                   ...m,
-                  content: `Sorry, I encountered an error: ${errorMsg}. Please try again.`,
+                  content: errorMsg,
                   isStreaming: false,
+                  isError: true,
+                  errorCode: 'network',
                 }
               : m
           )
@@ -233,10 +237,11 @@ export function useChat(context: ChatContext): UseChatReturn {
 
       case 'error': {
         const message = data.message as string;
+        const code = (data.code as string) ?? 'api_error';
         setMessages((prev) =>
           prev.map((m) =>
             m.id === assistantId
-              ? { ...m, content: message, isStreaming: false }
+              ? { ...m, content: message, isStreaming: false, isError: true, errorCode: code }
               : m
           )
         );

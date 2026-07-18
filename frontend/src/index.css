@@ -5,13 +5,18 @@
  * Includes:
  *   - RTL layout support (Arabic)
  *   - High-contrast mode overrides
- *   - Focus-visible states (WCAG 2.1)
- *   - Smooth scrolling
- *   - Custom scrollbar styling
+ *   - Focus-visible states (WCAG 2.1 AA)
+ *   - Smooth scrolling + custom scrollbar
  *   - Reduced motion support
+ *   - Premium glassmorphism utilities
+ *   - Micro-animation utilities
+ *   - Stadium pitch-line background texture (SVG)
+ *   - Data/monospace font for times, distances, zone codes
+ *   - Page-load stagger animations
+ *   - Language cross-fade transitions
  */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -22,6 +27,18 @@
   --font-size-base: 16px;
   --focus-ring: 3px solid #ffc80a;
   --transition-base: 200ms ease;
+  --glass-bg: rgba(13, 31, 53, 0.80);
+  --glass-border: rgba(48, 96, 255, 0.18);
+  --glass-blur: 20px;
+  --panel-bg: rgba(8, 21, 37, 0.95);
+  --sidebar-w: 72px;
+  --right-panel-w: 304px;
+
+  /* Page load stagger delays */
+  --stagger-sidebar: 0ms;
+  --stagger-header: 80ms;
+  --stagger-main: 160ms;
+  --stagger-panel: 240ms;
 }
 
 /* ── Base Resets ──────────────────────────────────────────────────────────── */
@@ -35,10 +52,37 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
+/* ── Body with stadium pitch-line background ──────────────────────────────── */
 body {
   @apply bg-stadium-dark text-white font-sans antialiased;
   min-height: 100dvh;
   overflow-x: hidden;
+  /* Layered gradient: deeper navy base + blue/gold radial accents */
+  background-color: #061018;
+  background-image:
+    radial-gradient(ellipse at 25% 0%, rgba(48, 96, 255, 0.10) 0%, transparent 55%),
+    radial-gradient(ellipse at 80% 85%, rgba(255, 200, 10, 0.05) 0%, transparent 50%),
+    radial-gradient(ellipse at 60% 40%, rgba(0, 212, 106, 0.03) 0%, transparent 40%);
+}
+
+/* Stadium pitch-line texture — faint SVG overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500' viewBox='0 0 800 500'%3E%3C!-- Pitch outline --%3E%3Crect x='40' y='30' width='720' height='440' fill='none' stroke='%23ffffff' stroke-width='2'/%3E%3C!-- Center circle --%3E%3Ccircle cx='400' cy='250' r='80' fill='none' stroke='%23ffffff' stroke-width='2'/%3E%3C!-- Center line --%3E%3Cline x1='400' y1='30' x2='400' y2='470' stroke='%23ffffff' stroke-width='2'/%3E%3C!-- Center dot --%3E%3Ccircle cx='400' cy='250' r='5' fill='%23ffffff'/%3E%3C!-- Left penalty area --%3E%3Crect x='40' y='155' width='130' height='190' fill='none' stroke='%23ffffff' stroke-width='2'/%3E%3C!-- Right penalty area --%3E%3Crect x='630' y='155' width='130' height='190' fill='none' stroke='%23ffffff' stroke-width='2'/%3E%3C!-- Left goal area --%3E%3Crect x='40' y='200' width='50' height='100' fill='none' stroke='%23ffffff' stroke-width='1.5'/%3E%3C!-- Right goal area --%3E%3Crect x='710' y='200' width='50' height='100' fill='none' stroke='%23ffffff' stroke-width='1.5'/%3E%3C!-- Floodlight rays --%3E%3Cline x1='0' y1='0' x2='400' y2='250' stroke='%23ffffff' stroke-width='0.5' opacity='0.3'/%3E%3Cline x1='800' y1='0' x2='400' y2='250' stroke='%23ffffff' stroke-width='0.5' opacity='0.3'/%3E%3Cline x1='0' y1='500' x2='400' y2='250' stroke='%23ffffff' stroke-width='0.5' opacity='0.3'/%3E%3Cline x1='800' y1='500' x2='400' y2='250' stroke='%23ffffff' stroke-width='0.5' opacity='0.3'/%3E%3C/svg%3E");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* All content must sit above texture */
+body > * {
+  position: relative;
+  z-index: 1;
 }
 
 /* ── RTL Support (Arabic) ─────────────────────────────────────────────────── */
@@ -57,14 +101,12 @@ body {
 }
 
 /* ── Focus Styles (WCAG 2.1 AA) ──────────────────────────────────────────── */
-/* Using focus-visible so mouse users don't see rings on click */
 *:focus-visible {
   outline: var(--focus-ring);
   outline-offset: 3px;
   border-radius: 4px;
 }
 
-/* Remove default outline — only show on keyboard navigation */
 *:focus:not(:focus-visible) {
   outline: none;
 }
@@ -89,8 +131,14 @@ body {
   color: #ffffff !important;
 }
 
+.high-contrast body::before {
+  display: none;
+}
+
 .high-contrast .bg-stadium-card,
-.high-contrast .bg-stadium-dark {
+.high-contrast .bg-stadium-dark,
+.high-contrast .glass-card,
+.high-contrast .glass-card-bright {
   background: #000000 !important;
   border: 1px solid #ffffff !important;
 }
@@ -98,6 +146,11 @@ body {
 .high-contrast a,
 .high-contrast button {
   outline: 2px solid #ffff00 !important;
+}
+
+.high-contrast .text-stadium-light,
+.high-contrast .text-stadium-muted {
+  color: #dddddd !important;
 }
 
 /* ── Reduced Motion ───────────────────────────────────────────────────────── */
@@ -114,36 +167,118 @@ body {
 
 /* ── Custom Scrollbar (Webkit) ────────────────────────────────────────────── */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 4px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #111f3a;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #2a4070;
-  border-radius: 3px;
+  background: rgba(48, 96, 255, 0.25);
+  border-radius: 99px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #3a5090;
+  background: rgba(48, 96, 255, 0.45);
 }
 
 /* ── Typography Scale Utilities ───────────────────────────────────────────── */
-/* These are set via JS when the user adjusts font size in settings */
 html[data-font-size="sm"]  { --font-size-base: 14px; }
 html[data-font-size="md"]  { --font-size-base: 16px; }
 html[data-font-size="lg"]  { --font-size-base: 18px; }
 html[data-font-size="xl"]  { --font-size-base: 20px; }
 
-/* ── Glass Card ───────────────────────────────────────────────────────────── */
-.glass-card {
-  background: rgba(17, 31, 58, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(48, 96, 255, 0.15);
+/* ── Data / Monospace Typography ──────────────────────────────────────────── */
+.font-data {
+  font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  font-feature-settings: 'tnum' 1;
+  letter-spacing: -0.02em;
 }
+
+/* ── Premium Glass Cards ──────────────────────────────────────────────────── */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.glass-card-bright {
+  background: rgba(13, 31, 53, 0.92);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(48, 96, 255, 0.22);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+/* Panel card — right side panel style */
+.panel-card {
+  background: var(--panel-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(26, 48, 82, 0.8);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+}
+
+/* ── Gradient Text ─────────────────────────────────────────────────────────── */
+.text-gradient-gold {
+  background: linear-gradient(90deg, #ffc80a, #ffd84d, #e6b000);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-brand {
+  background: linear-gradient(135deg, #7a9bff, #3060ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-pitch {
+  background: linear-gradient(135deg, #00ff87, #00d46a);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ── Premium Button Utilities ─────────────────────────────────────────────── */
+.btn-primary {
+  @apply relative overflow-hidden px-6 py-3 rounded-xl font-semibold text-white transition-all;
+  background: linear-gradient(135deg, #3060ff, #5580ff);
+  box-shadow: 0 0 24px rgba(48, 96, 255, 0.35), inset 0 1px 0 rgba(255,255,255,0.15);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 36px rgba(48, 96, 255, 0.5), inset 0 1px 0 rgba(255,255,255,0.2);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.08) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: shimmer 2.5s infinite;
+  pointer-events: none;
+}
+
+/* ── Thinking / Loading Animation ────────────────────────────────────────── */
+.thinking-dot {
+  @apply inline-block w-2 h-2 rounded-full bg-gold-400;
+  animation: thinkingDot 1.4s ease-in-out infinite;
+}
+
+.thinking-dot:nth-child(2) { animation-delay: 0.2s; }
+.thinking-dot:nth-child(3) { animation-delay: 0.4s; }
 
 /* ── Typing Indicator ─────────────────────────────────────────────────────── */
 .typing-dot {
@@ -161,7 +296,7 @@ html[data-font-size="xl"]  { --font-size-base: 20px; }
 
 /* ── Shimmer Loading ──────────────────────────────────────────────────────── */
 .shimmer {
-  background: linear-gradient(90deg, #111f3a 0%, #1e3160 50%, #111f3a 100%);
+  background: linear-gradient(90deg, #0d1f35 0%, #1a3052 50%, #0d1f35 100%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
@@ -172,13 +307,78 @@ html[data-font-size="xl"]  { --font-size-base: 20px; }
 }
 
 /* ── Crowd Density Badge Colors ───────────────────────────────────────────── */
-.density-low    { @apply bg-green-500/20 text-green-400 border border-green-500/30; }
-.density-medium { @apply bg-amber-500/20 text-amber-400 border border-amber-500/30; }
-.density-high   { @apply bg-red-500/20   text-red-400   border border-red-500/30; }
+.density-low {
+  @apply border;
+  background: rgba(0, 212, 106, 0.10);
+  color: #00ff87;
+  border-color: rgba(0, 212, 106, 0.3);
+}
+
+.density-medium {
+  @apply border;
+  background: rgba(245, 158, 11, 0.10);
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.density-high {
+  @apply border;
+  background: rgba(239, 68, 68, 0.10);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* Density strip bars for right panel */
+.density-strip-bar {
+  height: 6px;
+  border-radius: 3px;
+  transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.5s ease;
+}
+
+/* Zone badge pill */
+.zone-badge {
+  @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider;
+  font-family: 'JetBrains Mono', monospace;
+}
 
 /* ── Chat Message Animations ──────────────────────────────────────────────── */
 .message-enter {
-  animation: slideUp 0.25s ease-out forwards;
+  animation: slideUp 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Nav Active Indicator ─────────────────────────────────────────────────── */
+.nav-active-indicator {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  border-radius: 2px 0 0 2px;
+  background: linear-gradient(180deg, #ffc80a, #3060ff);
+}
+
+/* ── Live Pulse Dot ───────────────────────────────────────────────────────── */
+.live-dot {
+  @apply relative inline-flex w-2.5 h-2.5;
+}
+
+.live-dot::before {
+  content: '';
+  @apply absolute inset-0 rounded-full;
+  background-color: #00d46a;
+  animation: pulseRing 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.live-dot::after {
+  content: '';
+  @apply absolute inset-0.5 rounded-full;
+  background-color: #00ff87;
+}
+
+@keyframes pulseRing {
+  0%   { transform: scale(1); opacity: 0.7; }
+  100% { transform: scale(2.2); opacity: 0; }
 }
 
 /* ── Route Step Connector ─────────────────────────────────────────────────── */
@@ -189,4 +389,171 @@ html[data-font-size="xl"]  { --font-size-base: 20px; }
 
 .route-step:last-child::before {
   display: none;
+}
+
+/* ── Quick Action Chip ────────────────────────────────────────────────────── */
+.quick-action-chip {
+  @apply relative overflow-hidden flex items-center gap-2.5 px-4 py-3 rounded-2xl text-sm font-medium transition-all text-left;
+  background: rgba(13, 31, 53, 0.8);
+  border: 1px solid rgba(48, 96, 255, 0.18);
+  color: #8fafd4;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.quick-action-chip:hover {
+  border-color: rgba(255, 200, 10, 0.4);
+  color: #fff;
+  background: rgba(26, 48, 82, 0.9);
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 6px 20px rgba(48, 96, 255, 0.2), 0 0 0 1px rgba(255,200,10,0.15);
+}
+
+.quick-action-chip:active {
+  transform: translateY(0) scale(0.99);
+}
+
+.quick-action-chip:disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.quick-action-chip-icon {
+  @apply flex-shrink-0 w-8 h-8 rounded-xl flex items-center justify-center text-base;
+  background: rgba(48, 96, 255, 0.12);
+  border: 1px solid rgba(48, 96, 255, 0.2);
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.quick-action-chip:hover .quick-action-chip-icon {
+  background: rgba(255, 200, 10, 0.12);
+  border-color: rgba(255, 200, 10, 0.25);
+}
+
+/* ── Language Cross-Fade ──────────────────────────────────────────────────── */
+.lang-fade {
+  transition: opacity 0.25s ease;
+}
+
+.lang-fade-out {
+  opacity: 0;
+}
+
+/* ── Staggered animation helpers ──────────────────────────────────────────── */
+.stagger-1  { animation-delay: 0.05s; }
+.stagger-2  { animation-delay: 0.10s; }
+.stagger-3  { animation-delay: 0.15s; }
+.stagger-4  { animation-delay: 0.20s; }
+.stagger-5  { animation-delay: 0.25s; }
+.stagger-6  { animation-delay: 0.30s; }
+.stagger-7  { animation-delay: 0.35s; }
+
+/* Page-load stagger for layout zones */
+.animate-sidebar-in {
+  animation: sidebarIn 0.5s cubic-bezier(0.22,1,0.36,1) var(--stagger-sidebar) both;
+}
+
+.animate-panel-in {
+  animation: panelIn 0.55s cubic-bezier(0.22,1,0.36,1) var(--stagger-panel) both;
+}
+
+.animate-main-in {
+  animation: fadeInUp 0.45s ease-out var(--stagger-main) both;
+}
+
+/* ── Context Panel — Zone Map Pulsing Pin ─────────────────────────────────── */
+.map-pin-pulse {
+  animation: zonePulse 2.2s ease-in-out infinite;
+}
+
+/* ── Dashboard — Stat Tile ────────────────────────────────────────────────── */
+.stat-tile {
+  @apply relative overflow-hidden p-4 rounded-2xl;
+  background: rgba(13, 31, 53, 0.85);
+  border: 1px solid rgba(26, 48, 82, 0.9);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-tile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+/* ── Dashboard — Query Feed Card ─────────────────────────────────────────── */
+.feed-card {
+  @apply relative flex items-start gap-3 px-3 py-2.5 rounded-xl border transition-all;
+  background: rgba(13, 31, 53, 0.75);
+  border-color: rgba(26, 48, 82, 0.7);
+  animation: slideInRight 0.3s ease-out both;
+}
+
+.feed-card-urgent {
+  border-color: rgba(239, 68, 68, 0.3);
+  border-left: 3px solid #ef4444;
+  background: rgba(239, 68, 68, 0.06);
+  animation: slideInRight 0.3s ease-out both, urgentPulse 2s ease-in-out infinite;
+}
+
+@keyframes urgentPulse {
+  0%, 100% { box-shadow: none; }
+  50%       { box-shadow: 0 0 12px rgba(239,68,68,0.25); }
+}
+
+/* ── Accessibility Toggle Card ────────────────────────────────────────────── */
+.a11y-toggle-card {
+  @apply relative flex items-center justify-between p-4 rounded-2xl border transition-all cursor-pointer;
+  background: rgba(13, 31, 53, 0.8);
+  border-color: rgba(26, 48, 82, 0.8);
+}
+
+.a11y-toggle-card:hover {
+  border-color: rgba(48, 96, 255, 0.3);
+  background: rgba(26, 48, 82, 0.85);
+}
+
+.a11y-toggle-card.active {
+  border-color: rgba(0, 212, 106, 0.4);
+  background: rgba(0, 212, 106, 0.06);
+  box-shadow: 0 0 16px rgba(0, 212, 106, 0.1);
+}
+
+@keyframes thinkingDot {
+  0%, 100% { transform: scale(0.6); opacity: 0.4; }
+  50%       { transform: scale(1); opacity: 1; }
+}
+
+@keyframes sidebarIn {
+  0%   { opacity: 0; transform: translateX(-16px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes panelIn {
+  0%   { opacity: 0; transform: translateX(20px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+  0%   { opacity: 0; transform: translateX(12px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeInUp {
+  0%   { opacity: 0; transform: translateY(16px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  0%   { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  0%   { opacity: 0; transform: scale(0.92); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes zonePulse {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50%       { opacity: 1; transform: scale(1.08); }
 }

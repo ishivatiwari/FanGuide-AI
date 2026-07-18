@@ -37,7 +37,7 @@ export type SSEEvent =
   | { type: 'tool_result'; data: { tool_use_id: string; content: string; is_error: boolean } }
   | { type: 'thinking'; data: { round: number } }
   | { type: 'done'; data: { category: string; isUrgent: boolean } }
-  | { type: 'error'; data: { message: string } };
+  | { type: 'error'; data: { message: string; code: 'rate_limit' | 'api_error' | 'network' } };
 
 // ── Chat Messages ─────────────────────────────────────────────────────────────
 
@@ -59,6 +59,10 @@ export interface ChatMessage {
   toolAttachments?: ToolCallAttachment[];
   isStreaming?: boolean;
   isUrgent?: boolean;
+  /** Set to true when the message represents an API/network error */
+  isError?: boolean;
+  /** Error classification: 'rate_limit' | 'api_error' | 'network' */
+  errorCode?: string;
 }
 
 // ── Route Result (from getRoute tool) ────────────────────────────────────────

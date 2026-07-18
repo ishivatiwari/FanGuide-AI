@@ -4,7 +4,7 @@
  * Handles POST /api/chat:
  *   1. Validates request body with Zod
  *   2. Builds system instruction (context injection)
- *   3. Calls Gemini API with function-calling tools
+ *   3. Calls Gemini API with function-calling tools, retrying on 429
  *   4. Executes tool calls via toolExecutor
  *   5. Streams SSE events back to the frontend: text, tool_call, tool_result, done, error
  *   6. Records anonymized analytics
@@ -14,12 +14,13 @@
  *   tool_call   — { name: string, input: object }
  *   tool_result — { tool_use_id: string, content: string, is_error: boolean }
  *   done        — { category: string, isUrgent: boolean }
- *   error       — { message: string }
+ *   error       — { message: string, code: 'rate_limit' | 'api_error' | 'network' }
  *
  * SECURITY:
  *   - GEMINI_API_KEY never touches the client; it's read here server-side only
  *   - Input validated via Zod before any API call
  *   - Max 5 agentic rounds to prevent runaway tool loops
+ *   - Error messages are always sanitized before being sent to the client
  */
 import { Router, Request, Response } from 'express';
 import rateLimit from 'express-rate-limit';
@@ -54,6 +55,7 @@ chatRouter.post('/', (req: Request, res: Response) => {
 });
 
 const MAX_TOOL_ROUNDS = 5;
+const MAX_RETRY_ATTEMPTS = 3;
 
 // Attempt to categorize the user's message for analytics
 function categorizeQuery(message: string): QueryCategory {
@@ -77,6 +79,132 @@ function isUrgent(message: string, category: QueryCategory): boolean {
 /** Writes a single SSE event to the response */
 function sendSSE(res: Response, event: string, data: unknown): void {
   res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
+}
+
+/**
+ * Extracts the retry-after delay in ms from a Gemini 429 error.
+ * The Gemini SDK attaches errorDetails as a structured property on the error object,
+ * and also includes "Please retry in X.XXXs" in the message string.
+ */
+function extractRetryDelayMs(err: unknown): number {
+  if (!(err instanceof Error)) return 5000;
+
+  // 1. Check structured errorDetails (Gemini SDK attaches this)
+  const anyErr = err as Record<string, unknown>;
+  if (Array.isArray(anyErr.errorDetails)) {
+    for (const detail of anyErr.errorDetails as Record<string, unknown>[]) {
+      if (detail['@type']?.toString().includes('RetryInfo') && typeof detail.retryDelay === 'string') {
+        const seconds = parseFloat(detail.retryDelay.replace('s', ''));
+        if (!isNaN(seconds)) return Math.ceil(seconds * 1000) + 500;
+      }
+    }
+  }
+
+  // 2. Fallback: parse from message string (e.g. `"retryDelay":"7s"`)
+  const jsonMatch = err.message.match(/"retryDelay"\s*:\s*"(\d+(?:\.\d+)?)s"/);
+  if (jsonMatch) return Math.ceil(parseFloat(jsonMatch[1]) * 1000) + 500;
+
+  // 3. Inline "retry in Xs"
+  const inlineMatch = err.message.match(/retry in (\d+(?:\.\d+)?)s/i);
+  if (inlineMatch) return Math.ceil(parseFloat(inlineMatch[1]) * 1000) + 500;
+
+  return 8000;
+}
+
+/** Returns true if this error is a Gemini 429 rate-limit error */
+function isRateLimitError(err: unknown): boolean {
+  if (!(err instanceof Error)) return false;
+  return err.message.includes('429') ||
+    err.message.includes('Too Many Requests') ||
+    err.message.includes('RESOURCE_EXHAUSTED') ||
+    err.message.includes('free_tier');
+}
+
+/** Returns true if this error is a quota-exhausted (not retryable today) error */
+function isQuotaExhaustedError(err: unknown): boolean {
+  if (!(err instanceof Error)) return false;
+  // Daily quota exhausted: limit is 0
+  return err.message.includes('limit: 0') ||
+    err.message.includes('GenerateRequestsPerDay') ||
+    err.message.includes('free_tier_requests');
+}
+
+/** Sleep for a given number of milliseconds */
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * Calls model.generateContent with automatic retry on 429 rate-limit errors.
+ * Uses the retry delay from the error response, with exponential backoff fallback.
+ */
+async function generateWithRetry(
+  model: ReturnType<InstanceType<typeof GoogleGenerativeAI>['getGenerativeModel']>,
+  contents: Content[],
+  attempt = 0
+): Promise<Awaited<ReturnType<typeof model.generateContent>>> {
+  try {
+    return await model.generateContent({ contents });
+  } catch (err) {
+    // Don't retry if quota is fully exhausted for the day
+    if (isQuotaExhaustedError(err)) throw err;
+
+    if (isRateLimitError(err) && attempt < MAX_RETRY_ATTEMPTS) {
+      const delay = extractRetryDelayMs(err) * Math.pow(1.5, attempt); // Exponential backoff
+      console.warn(`[chat] Rate limited. Retrying in ${Math.round(delay)}ms (attempt ${attempt + 1}/${MAX_RETRY_ATTEMPTS})...`);
+      await sleep(delay);
+      return generateWithRetry(model, contents, attempt + 1);
+    }
+
+    throw err;
+  }
+}
+
+/**
+ * Returns a clean, user-friendly error message.
+ * Never exposes raw API errors, stack traces, or internal details.
+ */
+function toUserFriendlyError(err: unknown): { message: string; code: string } {
+  if (!(err instanceof Error)) {
+    return {
+      message: "Something went wrong. Please try again.",
+      code: 'api_error',
+    };
+  }
+
+  if (isQuotaExhaustedError(err)) {
+    return {
+      message: "The AI assistant is temporarily unavailable due to high demand. Please try again later, or speak to a stadium steward for help.",
+      code: 'rate_limit',
+    };
+  }
+
+  if (isRateLimitError(err)) {
+    return {
+      message: "Too many requests right now. Please wait a few seconds and try again.",
+      code: 'rate_limit',
+    };
+  }
+
+  if (err.message.includes('API_KEY') || err.message.includes('401') || err.message.includes('403')) {
+    return {
+      message: "The AI service is not configured correctly. Please contact the help desk.",
+      code: 'api_error',
+    };
+  }
+
+  if (err.message.includes('fetch') || err.message.includes('ECONNREFUSED') || err.message.includes('network')) {
+    return {
+      message: "I'm having trouble connecting. Please check your connection and try again.",
+      code: 'network',
+    };
+  }
+
+  // Generic fallback — never leak internals
+  return {
+    message: "I encountered an issue processing your request. Please try again.",
+    code: 'api_error',
+  };
 }
 
 export async function handleChat(req: Request, res: Response): Promise<void> {
@@ -134,9 +262,7 @@ export async function handleChat(req: Request, res: Response): Promise<void> {
     while (rounds < MAX_TOOL_ROUNDS) {
       rounds++;
 
-      const result = await model.generateContent({
-        contents: conversationHistory,
-      });
+      const result = await generateWithRetry(model, conversationHistory);
 
       const response = result.response;
       const candidate = response.candidates?.[0];
@@ -148,7 +274,6 @@ export async function handleChat(req: Request, res: Response): Promise<void> {
 
       for (const part of parts) {
         if (part.text) {
-          // Text chunk — stream to frontend
           sendSSE(res, 'text', { text: part.text });
         }
 
@@ -157,10 +282,8 @@ export async function handleChat(req: Request, res: Response): Promise<void> {
           const { name, args } = part.functionCall;
           const toolInput = (args ?? {}) as Record<string, unknown>;
 
-          // Notify frontend a tool call is happening
           sendSSE(res, 'tool_call', { name, input: toolInput });
 
-          // Execute the tool
           let toolResult: unknown;
           let isError = false;
           try {
@@ -173,14 +296,12 @@ export async function handleChat(req: Request, res: Response): Promise<void> {
           }
 
           const resultStr = JSON.stringify(toolResult);
-          // Notify frontend of the result
           sendSSE(res, 'tool_result', {
             tool_use_id: name,
             content: resultStr,
             is_error: isError,
           });
 
-          // Prepare function response for next Gemini round
           functionResponses.push({
             functionResponse: {
               name,
@@ -190,21 +311,11 @@ export async function handleChat(req: Request, res: Response): Promise<void> {
         }
       }
 
-      // Append the model's response to the conversation
-      conversationHistory.push({
-        role: 'model',
-        parts,
-      });
+      conversationHistory.push({ role: 'model', parts });
 
       if (hasFunctionCalls && functionResponses.length > 0) {
-        // Append function results and continue the loop
-        conversationHistory.push({
-          role: 'user',
-          parts: functionResponses,
-        });
-        // Continue the while loop for the next round
+        conversationHistory.push({ role: 'user', parts: functionResponses });
       } else {
-        // No function calls — we're done
         break;
       }
     }
@@ -213,7 +324,6 @@ export async function handleChat(req: Request, res: Response): Promise<void> {
     try {
       recordQuery(context.sessionId, category, urgent);
     } catch (err) {
-      // Non-fatal: analytics failures should not affect the response
       console.error('Failed to record analytics query:', err);
     }
 
@@ -221,14 +331,12 @@ export async function handleChat(req: Request, res: Response): Promise<void> {
     sendSSE(res, 'done', { category, isUrgent: urgent });
     res.end();
   } catch (err) {
-    console.error('[chat] Error calling Gemini API:', err);
+    // Always log the full error server-side for debugging
+    console.error('[chat] Error calling Gemini API:', err instanceof Error ? err.message : err);
 
-    const errorMessage =
-      process.env.NODE_ENV === 'production'
-        ? "I'm having trouble connecting right now. Please try again or find a staff member."
-        : `AI error: ${err instanceof Error ? err.message : String(err)}`;
-
-    sendSSE(res, 'error', { message: errorMessage });
+    // But only send a clean, user-friendly message to the client
+    const { message: userMessage, code } = toUserFriendlyError(err);
+    sendSSE(res, 'error', { message: userMessage, code });
     res.end();
   }
 }
