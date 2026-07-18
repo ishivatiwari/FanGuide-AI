@@ -13,7 +13,7 @@ import { startCrowdDensitySimulation } from './services/crowdDensity';
 
 const PORT = parseInt(process.env.PORT ?? '3001', 10);
 
-async function main(): Promise<void> {
+async function main(): Promise<import('express').Application> {
   // ── 1. Validate required environment variables ──────────────────────────────
   if (!process.env.GEMINI_API_KEY) {
     console.error(
@@ -42,13 +42,21 @@ async function main(): Promise<void> {
 
   // ── 4. Create and start Express app ─────────────────────────────────────────
   const app = createApp();
-  app.listen(PORT, () => {
-    console.log(`[startup] FanGuide AI backend running on http://localhost:${PORT}`);
-    console.log(`[startup] Environment: ${process.env.NODE_ENV ?? 'development'}`);
-  });
+
+  if (!process.env.VERCEL) {
+    app.listen(PORT, () => {
+      console.log(`[startup] FanGuide AI backend running on http://localhost:${PORT}`);
+      console.log(`[startup] Environment: ${process.env.NODE_ENV ?? 'development'}`);
+    });
+  }
+
+  return app;
 }
 
-main().catch((err) => {
-  console.error('[FATAL] Unhandled startup error:', err);
-  process.exit(1);
-});
+const appPromise = main();
+
+// For Vercel Serverless function support, export a handler that resolves the app
+export default async function handler(req: any, res: any) {
+  const app = await appPromise;
+  return app(req, res);
+}

@@ -90,7 +90,7 @@ function extractRetryDelayMs(err: unknown): number {
   if (!(err instanceof Error)) return 5000;
 
   // 1. Check structured errorDetails (Gemini SDK attaches this)
-  const anyErr = err as Record<string, unknown>;
+  const anyErr = err as any;
   if (Array.isArray(anyErr.errorDetails)) {
     for (const detail of anyErr.errorDetails as Record<string, unknown>[]) {
       if (detail['@type']?.toString().includes('RetryInfo') && typeof detail.retryDelay === 'string') {
