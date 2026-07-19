@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://YOUR-BACKEND-VERCEL-URL.vercel.app/api/:path*"
+      "destination": "https://fan-guide-ai.vercel.app/api/:path*"
     },
     {
       "source": "/((?!assets/).*)",
