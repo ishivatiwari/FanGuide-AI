@@ -483,7 +483,7 @@ export function DashboardPage() {
 
   const data = dashboardData ?? buildMockData();
   const alertCount = data.urgentAlerts.length;
-  const highZones = Object.values(data.crowdDensity.zones).filter(z => (z as any).density === 'high').length;
+  const highZones = Object.values(data.crowdDensity.zones).filter(z => z.density === 'high').length;
   const avgWait = 8; // Static demo value
 
   return (
@@ -587,7 +587,7 @@ export function DashboardPage() {
               {highZones} zone{highZones !== 1 ? 's' : ''} at HIGH capacity
             </span>
           </div>
-          <StadiumHeatmap zones={data.crowdDensity.zones as any} />
+          <StadiumHeatmap zones={data.crowdDensity.zones} />
         </section>
 
         {/* Bottom 2-column: feed + breakdown */}

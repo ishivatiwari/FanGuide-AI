@@ -224,13 +224,13 @@ export function MapPage() {
 
             if (zone.shape === 'rect') {
               return (
-                <rect key={zone.id} {...commonProps} {...(zone.props as any)}>
+                <rect key={zone.id} {...commonProps} {...(zone.props as React.SVGProps<SVGRectElement>)}>
                   <title>{zone.label}: {density} crowd density</title>
                 </rect>
               );
             } else if (zone.shape === 'ellipse') {
               return (
-                <ellipse key={zone.id} {...commonProps} {...(zone.props as any)}>
+                <ellipse key={zone.id} {...commonProps} {...(zone.props as React.SVGProps<SVGEllipseElement>)}>
                   <title>{zone.label}: {density} crowd density</title>
                 </ellipse>
               );
