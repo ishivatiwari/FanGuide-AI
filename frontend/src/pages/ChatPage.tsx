@@ -27,13 +27,13 @@ import { ChatMessageBubble } from '../components/chat/ChatMessage';
 import { clsx } from 'clsx';
 
 const QUICK_ACTIONS = [
-  { emoji: '🪑', label: 'Find my seat',    message: 'How do I get to my seat?' },
-  { emoji: '🚻', label: 'Restroom',         message: 'Where is the nearest accessible restroom?' },
-  { emoji: '🍔', label: 'Food options',     message: 'Where can I find halal or vegan food?' },
-  { emoji: '🚇', label: 'Getting home',     message: 'How do I get to Penn Station after the match?' },
-  { emoji: '♿', label: 'Accessibility',    message: 'What accessibility services are available at my gate?' },
-  { emoji: '🚪', label: 'Nearest exit',    message: 'Where is the nearest exit from my section?' },
-  { emoji: '🌐', label: 'Translate for me', message: 'Can you help me translate something?' },
+  { emoji: '🪑', labelKey: 'chat.action.seat',          messageKey: 'chat.action.seat.message' },
+  { emoji: '🚻', labelKey: 'chat.action.restroom',      messageKey: 'chat.action.restroom.message' },
+  { emoji: '🍔', labelKey: 'chat.action.food',          messageKey: 'chat.action.food.message' },
+  { emoji: '🚇', labelKey: 'chat.action.transit',       messageKey: 'chat.action.transit.message' },
+  { emoji: '♿', labelKey: 'chat.action.accessibility',  messageKey: 'chat.action.accessibility.message' },
+  { emoji: '🚪', labelKey: 'chat.action.exit',           messageKey: 'chat.action.exit.message' },
+  { emoji: '🌐', labelKey: 'chat.action.translate',      messageKey: 'chat.action.translate.message' },
 ];
 
 const MAX_MESSAGE_LENGTH = 1000;
@@ -135,21 +135,21 @@ export function ChatPage() {
             >
               {QUICK_ACTIONS.map((action, i) => (
                 <button
-                  key={action.label}
-                  onClick={() => sendMessage(action.message)}
+                  key={action.labelKey}
+                  onClick={() => sendMessage(t(action.messageKey))}
                   disabled={isLoading}
                   className={clsx(
                     'quick-action-chip',
                     `stagger-${Math.min(i + 1, 7)}`,
                   )}
                   style={{ animationFillMode: 'both' }}
-                  aria-label={action.message}
+                  aria-label={t(action.messageKey)}
                 >
                   <span className="quick-action-chip-icon" aria-hidden="true">
                     {action.emoji}
                   </span>
                   <span className="flex-1 text-left text-sm font-medium">
-                    {action.label}
+                    {t(action.labelKey)}
                   </span>
                   <svg
                     viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"

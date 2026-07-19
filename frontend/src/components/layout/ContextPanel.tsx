@@ -16,6 +16,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { clsx } from 'clsx';
+import { useTranslation } from 'react-i18next';
 import type { ToolCallAttachment, RouteResult } from '../../types';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -88,6 +89,7 @@ const GATE_POSITIONS: Record<string, { x: number; y: number; label: string }> = 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
 function CountdownWidget() {
+  const { t } = useTranslation();
   const [timeLeft, setTimeLeft] = useState({ d: 0, h: 0, m: 0, s: 0, total: 0 });
 
   useEffect(() => {
@@ -115,23 +117,23 @@ function CountdownWidget() {
   return (
     <section
       className="panel-card p-3"
-      aria-label="Kickoff countdown"
+      aria-label={t('panel.kickoffIn')}
       aria-live="polite"
       aria-atomic="true"
     >
       <div className="flex items-center gap-1.5 mb-2">
         <span className="text-[9px] font-bold tracking-[0.2em] uppercase text-gold-400">
-          ⚽ KICKOFF IN
+          ⚽ {t('panel.kickoffIn').toUpperCase()}
         </span>
         <span className="live-dot flex-shrink-0 ml-auto" aria-hidden="true" />
       </div>
       <div className="flex items-end gap-1.5">
         {[
-          { value: timeLeft.d, unit: 'D' },
-          { value: timeLeft.h, unit: 'H' },
-          { value: timeLeft.m, unit: 'M' },
-          { value: timeLeft.s, unit: 'S' },
-        ].map(({ value, unit }, i) => (
+          { value: timeLeft.d, unit: 'D', keyName: 'days' },
+          { value: timeLeft.h, unit: 'H', keyName: 'hours' },
+          { value: timeLeft.m, unit: 'M', keyName: 'minutes' },
+          { value: timeLeft.s, unit: 'S', keyName: 'seconds' },
+        ].map(({ value, unit, keyName }, i) => (
           <React.Fragment key={unit}>
             {i > 0 && (
               <span className="text-gold-600 font-data text-lg font-bold mb-1">:</span>
@@ -144,7 +146,7 @@ function CountdownWidget() {
                 {pad(value)}
               </span>
               <span className="text-[8px] text-stadium-light font-bold tracking-widest uppercase mt-0.5">
-                {unit}
+                {t(`panel.unit.${keyName}`)}
               </span>
             </div>
           </React.Fragment>
@@ -158,19 +160,20 @@ function CountdownWidget() {
 }
 
 function StadiumMiniMap({ zones, userZone }: { zones: ZoneData[]; userZone: string }) {
+  const { t } = useTranslation();
   const densityByGate: Record<string, DensityLevel> = {};
   zones.forEach(z => { densityByGate[z.id] = z.density; });
 
   const userGate = userZone?.toLowerCase().replace('gate ', 'gate-') || 'gate-a';
 
   return (
-    <section className="panel-card p-3" aria-label="Stadium zone map">
+    <section className="panel-card p-3" aria-label={t('map.title')}>
       <div className="flex items-center justify-between mb-2">
         <span className="text-[9px] font-bold tracking-[0.2em] uppercase text-stadium-light">
-          📍 STADIUM MAP
+          📍 {t('map.title').toUpperCase()}
         </span>
         <span className="zone-badge density-low text-pitch-400">
-          Gate A · Zone 2
+          {userZone}
         </span>
       </div>
       <div className="relative">
@@ -256,7 +259,7 @@ function StadiumMiniMap({ zones, userZone }: { zones: ZoneData[]; userZone: stri
               fill="#ffc80a"
               letterSpacing="1"
             >
-              YOU
+              {t('panel.you').toUpperCase()}
             </text>
           )}
         </svg>
@@ -269,7 +272,7 @@ function StadiumMiniMap({ zones, userZone }: { zones: ZoneData[]; userZone: stri
                 className="inline-block w-2 h-2 rounded-full"
                 style={{ background: DENSITY_COLORS[lvl].bar }}
               />
-              {lvl.charAt(0).toUpperCase() + lvl.slice(1)}
+              {t(`panel.legend.${lvl}`)}
             </span>
           ))}
         </div>
@@ -279,16 +282,17 @@ function StadiumMiniMap({ zones, userZone }: { zones: ZoneData[]; userZone: stri
 }
 
 function DensityStrip({ zones, isUpdating }: { zones: ZoneData[]; isUpdating: boolean }) {
+  const { t } = useTranslation();
   return (
     <section
       className="panel-card p-3"
-      aria-label="Live crowd density"
+      aria-label={t('panel.crowdDensity')}
       aria-live="polite"
       aria-atomic="false"
     >
       <div className="flex items-center gap-2 mb-2.5">
         <span className="text-[9px] font-bold tracking-[0.2em] uppercase text-stadium-light">
-          👥 CROWD DENSITY
+          👥 {t('panel.crowdDensity').toUpperCase()}
         </span>
         <span className={clsx(
           'live-dot flex-shrink-0 ml-auto',
@@ -299,7 +303,7 @@ function DensityStrip({ zones, isUpdating }: { zones: ZoneData[]; isUpdating: bo
         {zones.map((zone) => {
           const colors = DENSITY_COLORS[zone.density];
           return (
-            <div key={zone.id} aria-label={`${zone.label}: ${zone.density} at ${zone.pct}%`}>
+            <div key={zone.id} aria-label={`${zone.label}: ${t(`panel.legend.${zone.density}`)} at ${zone.pct}%`}>
               <div className="flex items-center justify-between mb-1">
                 <span className="font-data text-[10px] text-gray-300 tracking-tight">
                   {zone.label}
@@ -308,7 +312,7 @@ function DensityStrip({ zones, isUpdating }: { zones: ZoneData[]; isUpdating: bo
                   className="font-data text-[9px] font-bold uppercase tracking-wider"
                   style={{ color: colors.text }}
                 >
-                  {zone.density}
+                  {t(`panel.legend.${zone.density}`)}
                 </span>
               </div>
               <div className="h-1.5 bg-stadium-dark rounded-full overflow-hidden">
@@ -330,27 +334,28 @@ function DensityStrip({ zones, isUpdating }: { zones: ZoneData[]; isUpdating: bo
         })}
       </div>
       <p className="text-[9px] text-stadium-light mt-2 font-data">
-        Updated {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+        {t('panel.updated')} {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
       </p>
     </section>
   );
 }
 
 function RouteResultCard({ route }: { route: RouteResult }) {
+  const { t } = useTranslation();
   const totalMin = Math.ceil(route.totalDurationSeconds / 60);
 
   return (
     <section
       className="panel-card p-3 animate-card-enter"
-      aria-label="Route guidance"
+      aria-label={t('panel.yourRoute')}
       style={{ animation: 'cardEnter 0.45s cubic-bezier(0.34,1.4,0.64,1) both' }}
     >
       <div className="flex items-center justify-between mb-2.5">
         <span className="text-[9px] font-bold tracking-[0.2em] uppercase text-gold-400">
-          🗺️ YOUR ROUTE
+          🗺️ {t('panel.yourRoute').toUpperCase()}
         </span>
         <span className="font-data text-xs font-bold text-gold-400">
-          ~{totalMin} min
+          ~{totalMin} {t('route.minutes')}
         </span>
       </div>
 
@@ -380,7 +385,7 @@ function RouteResultCard({ route }: { route: RouteResult }) {
               <div className="flex items-center gap-1.5 mt-0.5">
                 <span className="text-[10px] text-stadium-light">🚶</span>
                 <span className="font-data text-[10px] text-stadium-light">
-                  via {step.via} · {Math.ceil(step.durationSeconds / 60)}min
+                  {t('route.via')} {step.via} · {Math.ceil(step.durationSeconds / 60)}{t('route.minutes')}
                 </span>
                 {step.accessible && (
                   <span className="text-[9px] text-pitch-400">♿</span>
@@ -410,9 +415,10 @@ function RouteResultCard({ route }: { route: RouteResult }) {
 }
 
 function EmptyToolState() {
+  const { t } = useTranslation();
   return (
     <section className="panel-card p-4 flex flex-col items-center text-center gap-2.5"
-      aria-label="Awaiting query">
+      aria-label={t('panel.guidanceReady')}>
       <div className="relative w-10 h-10">
         <div className="absolute inset-0 rounded-full border border-brand-500/20 animate-ping" />
         <div className="w-10 h-10 rounded-full bg-brand-500/10 border border-brand-500/20
@@ -421,9 +427,9 @@ function EmptyToolState() {
         </div>
       </div>
       <div>
-        <p className="text-[11px] font-semibold text-white">Live Guidance Ready</p>
+        <p className="text-[11px] font-semibold text-white">{t('panel.guidanceReady')}</p>
         <p className="text-[10px] text-stadium-light mt-0.5 leading-relaxed">
-          Ask a question to see route maps and live data appear here
+          {t('panel.guidanceDesc')}
         </p>
       </div>
       <div className="flex gap-1 mt-1">
@@ -438,6 +444,7 @@ function EmptyToolState() {
 // ── Main Component ────────────────────────────────────────────────────────────
 
 export function ContextPanel({ latestToolAttachment, userZone = 'Gate A' }: ContextPanelProps) {
+  const { t } = useTranslation();
   const [isUpdating, setIsUpdating] = useState(false);
   const [displayZones, setDisplayZones] = useState<ZoneData[]>(ZONE_SETS[0]);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -475,13 +482,13 @@ export function ContextPanel({ latestToolAttachment, userZone = 'Gate A' }: Cont
   return (
     <aside
       className="flex flex-col gap-3 h-full overflow-y-auto py-4 px-3 animate-panel-in"
-      aria-label="Live context panel"
+      aria-label={t('panel.liveContext')}
       role="complementary"
     >
       {/* Header label */}
       <div className="flex items-center gap-2 px-1">
         <span className="text-[9px] font-bold tracking-[0.25em] uppercase text-stadium-light">
-          LIVE CONTEXT
+          {t('panel.liveContext').toUpperCase()}
         </span>
         <div className="h-px flex-1 bg-stadium-border/60" />
         <span className="live-dot" aria-label="Live data" />
